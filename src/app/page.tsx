@@ -5,6 +5,7 @@ import { MatchesTable } from "@/components/MatchesTable";
 import { RegisterForm } from "@/components/RegisterForm";
 import { ResultUploadForm } from "@/components/ResultUploadForm";
 import { StandingsTable } from "@/components/StandingsTable";
+import { SplashOverlay } from "@/components/SplashOverlay";
 import type { PublicTournamentState } from "@/lib/api-types";
 
 export const dynamic = "force-dynamic";
@@ -51,6 +52,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <SplashOverlay src="/efootball1.jpeg" />
       <header className="relative overflow-hidden border-b border-white/10">
         <HeroBackdrop />
         <div className="relative mx-auto max-w-5xl px-4 pb-16 pt-12 sm:pt-16">
