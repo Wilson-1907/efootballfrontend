@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1400" viewBox="0 0 900 1400">
+  <defs>
+    <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#34d399" stop-opacity="0.95"/>
+      <stop offset="0.7" stop-color="#22c55e" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#0ea5e9" stop-opacity="0.12"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- stylized silhouette (license-safe placeholder) -->
+  <path filter="url(#glow)" fill="url(#g)" d="M440 120c80 0 140 60 140 140s-60 140-140 140-140-60-140-140 60-140 140-140z"/>
+  <path filter="url(#glow)" fill="url(#g)" d="M290 470c40-60 100-90 170-90s130 30 170 90c40 60 70 160 80 250 10 90-10 170-60 220-50 50-120 70-190 70s-140-20-190-70c-50-50-70-130-60-220 10-90 40-190 80-250z"/>
+  <path filter="url(#glow)" fill="url(#g)" d="M255 960c70 45 135 65 205 65s135-20 205-65c30 90 60 240 70 360 6 70-30 80-75 80H260c-45 0-81-10-75-80 10-120 40-270 70-360z"/>
+  <path filter="url(#glow)" fill="url(#g)" d="M180 760c25-85 60-160 110-220 18-22 52-24 74-6 22 18 24 52 6 74-38 46-64 104-84 172-12 37-51 57-88 45s-57-51-45-88z"/>
+  <path filter="url(#glow)" fill="url(#g)" d="M720 760c-25-85-60-160-110-220-18-22-52-24-74-6-22 18-24 52-6 74 38 46 64 104 84 172 12 37 51 57 88 45s57-51 45-88z"/>
+</svg>
+

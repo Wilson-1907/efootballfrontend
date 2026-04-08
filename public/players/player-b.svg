@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1400" viewBox="0 0 900 1400">
+  <defs>
+    <linearGradient id="g2" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#a78bfa" stop-opacity="0.75"/>
+      <stop offset="0.6" stop-color="#22c55e" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#38bdf8" stop-opacity="0.12"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="14" result="b"/>
+      <feColorMatrix in="b" type="matrix"
+        values="1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 .9 0" result="c"/>
+      <feMerge>
+        <feMergeNode in="c"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path filter="url(#soft)" fill="url(#g2)" d="M480 140c70 0 120 50 120 120s-50 120-120 120-120-50-120-120 50-120 120-120z"/>
+  <path filter="url(#soft)" fill="url(#g2)" d="M260 520c55-75 130-110 220-110s165 35 220 110c60 80 95 220 95 325 0 115-45 195-125 240-65 36-130 45-190 45s-125-9-190-45c-80-45-125-125-125-240 0-105 35-245 95-325z"/>
+  <path filter="url(#soft)" fill="url(#g2)" d="M300 1060c65 40 125 55 180 55s115-15 180-55c25 110 45 220 45 290 0 50-25 70-70 70H325c-45 0-70-20-70-70 0-70 20-180 45-290z"/>
+  <path filter="url(#soft)" fill="url(#g2)" d="M190 900c30-70 75-150 130-220 20-25 57-30 82-10 25 20 30 57 10 82-45 56-80 120-105 178-15 35-56 51-91 36-35-15-51-56-36-91z"/>
+</svg>
+
