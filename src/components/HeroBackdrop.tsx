@@ -27,9 +27,9 @@ export function HeroBackdrop() {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-top opacity-85 mix-blend-screen"
+            className="object-contain object-center opacity-90 mix-blend-screen"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/55" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/10 to-black/65" />
         </div>
       </div>
 
