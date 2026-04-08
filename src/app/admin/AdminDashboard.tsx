@@ -85,22 +85,37 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const tournamentName = String(fd.get("tournamentName") ?? "");
-    const registrationStartsAt = String(fd.get("registrationStartsAt") ?? "");
-    const registrationEndsAt = String(fd.get("registrationEndsAt") ?? "");
-    const tournamentStartsAt = String(fd.get("tournamentStartsAt") ?? "");
-    const tournamentEndsAt = String(fd.get("tournamentEndsAt") ?? "");
+    const registrationStartsAtRaw = String(fd.get("registrationStartsAt") ?? "");
+    const registrationEndsAtRaw = String(fd.get("registrationEndsAt") ?? "");
+    const tournamentStartsAtRaw = String(fd.get("tournamentStartsAt") ?? "");
+    const tournamentEndsAtRaw = String(fd.get("tournamentEndsAt") ?? "");
     const matchDurationMinutes = Number(fd.get("matchDurationMinutes") ?? 90);
     const breakMinutes = Number(fd.get("breakMinutes") ?? 15);
     const rulesMarkdown = String(fd.get("rulesMarkdown") ?? "");
+
+    // Render/server runs in UTC. `datetime-local` strings have no timezone, so we must
+    // convert them to ISO in the browser timezone before sending to the API.
+    const toIso = (v: string) => {
+      const s = v.trim();
+      if (!s) return "";
+      const d = new Date(s);
+      return Number.isNaN(d.getTime()) ? "" : d.toISOString();
+    };
+
+    const registrationStartsAt = toIso(registrationStartsAtRaw);
+    const registrationEndsAt = toIso(registrationEndsAtRaw);
+    const tournamentStartsAt = toIso(tournamentStartsAtRaw);
+    const tournamentEndsAt = toIso(tournamentEndsAtRaw);
+
     const r = await fetch("/api/admin/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         tournamentName,
-        registrationStartsAt,
-        registrationEndsAt,
-        tournamentStartsAt,
-        tournamentEndsAt,
+        registrationStartsAt: registrationStartsAt || undefined,
+        registrationEndsAt: registrationEndsAt || undefined,
+        tournamentStartsAt: tournamentStartsAt || undefined,
+        tournamentEndsAt: tournamentEndsAt || undefined,
         matchDurationMinutes,
         breakMinutes,
         rulesMarkdown,
