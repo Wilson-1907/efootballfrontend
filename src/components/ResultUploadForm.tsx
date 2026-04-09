@@ -4,8 +4,10 @@ import { useState } from "react";
 
 export function ResultUploadForm({
   enabled,
+  tournamentComplete,
 }: {
   enabled: boolean;
+  tournamentComplete?: boolean;
 }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "err">(
@@ -16,8 +18,18 @@ export function ResultUploadForm({
   if (!enabled) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm text-slate-400">
-        Result upload opens when fixtures are published and the tournament is
-        active.
+        {tournamentComplete ? (
+          <>
+            All fixtures are finished and the final table is complete. See{" "}
+            <span className="text-slate-200">Champion &amp; analysis</span>{" "}
+            below — result uploads are closed.
+          </>
+        ) : (
+          <>
+            Result upload opens when fixtures are published and the tournament is
+            active.
+          </>
+        )}
       </div>
     );
   }

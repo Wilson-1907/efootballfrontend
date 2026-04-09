@@ -25,6 +25,27 @@ export type PublicMatch = {
   away: { id: string; name: string };
 };
 
+export type TournamentWrapUp = {
+  champion: StandingsRow;
+  runnerUp: StandingsRow | null;
+  thirdPlace: StandingsRow | null;
+  stats: {
+    totalMatches: number;
+    totalGoals: number;
+    avgGoalsPerMatch: string;
+    draws: number;
+    biggestWin: {
+      margin: number;
+      scoreline: string;
+      winnerName: string;
+      loserName: string;
+    } | null;
+  };
+  goldenBoot: { playerName: string; goals: number } | null;
+  bestDefense: { playerName: string; goalsAgainst: number } | null;
+  analysis: string[];
+};
+
 export type PublicTournamentState = {
   tournamentName: string;
   tournamentStopped: boolean;
@@ -42,4 +63,7 @@ export type PublicTournamentState = {
   standings: StandingsRow[];
   confirmedCount: number;
   totalRegistered: number;
+  /** True when every scheduled match has a recorded result */
+  tournamentComplete?: boolean;
+  tournamentWrapUp?: TournamentWrapUp | null;
 };

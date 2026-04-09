@@ -6,6 +6,7 @@ import { RegisterForm } from "@/components/RegisterForm";
 import { ResultUploadForm } from "@/components/ResultUploadForm";
 import { StandingsTable } from "@/components/StandingsTable";
 import { SplashGate } from "@/components/SplashGate";
+import { TournamentWrapUpSection } from "@/components/TournamentWrapUp";
 import type { PublicTournamentState } from "@/lib/api-types";
 
 export const dynamic = "force-dynamic";
@@ -78,6 +79,14 @@ export default async function HomePage() {
             >
               Fixtures &amp; table
             </a>
+            {state.tournamentWrapUp ? (
+              <a
+                href="#tournament-results"
+                className="rounded-xl border border-amber-400/40 bg-amber-400/10 px-5 py-3 text-sm font-semibold text-amber-100 hover:bg-amber-400/20"
+              >
+                Champion &amp; analysis
+              </a>
+            ) : null}
           </div>
         </div>
       </header>
@@ -167,8 +176,10 @@ export default async function HomePage() {
               enabled={
                 state.fixturesGenerated &&
                 !state.tournamentStopped &&
-                state.matches.length > 0
+                state.matches.length > 0 &&
+                state.tournamentComplete !== true
               }
+              tournamentComplete={state.tournamentComplete === true}
             />
           </div>
         </section>
@@ -226,6 +237,10 @@ export default async function HomePage() {
           </div>
           <StandingsTable standings={state.standings} />
         </section>
+
+        {state.tournamentWrapUp ? (
+          <TournamentWrapUpSection wrap={state.tournamentWrapUp} />
+        ) : null}
 
         {!state.registrationOpen ? (
           <section className="space-y-4">
