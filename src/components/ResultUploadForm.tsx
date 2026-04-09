@@ -49,11 +49,13 @@ export function ResultUploadForm({
       encType="multipart/form-data"
     >
       <p className="sm:col-span-2 text-sm text-slate-400">
-        Upload a screenshot of your match result. The system reads the image and
-        updates the table automatically if both{" "}
-        <span className="text-slate-200">registered Konami names</span> and the
-        score are visible, and you are one of the two players in that scheduled
-        match.
+        Upload a screenshot of your match result. The system only accepts images
+        that match a fixture on this site: both{" "}
+        <span className="text-slate-200">registered Konami names</span>, a clear
+        score (e.g. 2-1), the correct scheduled match, and you must be one of the
+        two players. If it does not match, the upload is{" "}
+        <span className="text-slate-200">refused</span> — put the correct results
+        and try again.
       </p>
       <label className="block text-sm sm:col-span-2">
         <span className="text-emerald-100/80">Registered email</span>
