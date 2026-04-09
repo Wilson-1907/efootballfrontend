@@ -36,12 +36,26 @@ export function MatchesTable({
   matches,
   caption,
   variant = "public",
+  confirmedCount,
+  fixturesGenerated,
 }: {
   matches: MatchPublic[];
   caption?: string;
   variant?: "public" | "admin-readonly";
+  confirmedCount?: number;
+  fixturesGenerated?: boolean;
 }) {
   const isDark = variant === "admin-readonly";
+
+  const emptyMessage = (() => {
+    if ((confirmedCount ?? 0) < 2) {
+      return "The draw needs at least two confirmed players. Once both are confirmed and registration has closed, fixtures appear here automatically.";
+    }
+    if (fixturesGenerated === false) {
+      return "Registration is still open or the draw has not run yet. Fixtures appear here after the registration deadline.";
+    }
+    return "Fixtures are being generated. Refresh the page in a few seconds.";
+  })();
 
   return (
     <div className="overflow-x-auto rounded-2xl ring-1 ring-black/5 dark:ring-white/10">
@@ -72,8 +86,7 @@ export function MatchesTable({
                     : "py-10 text-center text-emerald-900/50 dark:text-slate-500"
                 }
               >
-                Fixtures will appear here once registration closes and pairings
-                are generated.
+                {emptyMessage}
               </td>
             </tr>
           ) : (

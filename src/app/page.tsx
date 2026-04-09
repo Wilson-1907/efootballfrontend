@@ -110,11 +110,12 @@ export default async function HomePage() {
             ) : (
               <>
                 Registration closed on{" "}
-                <span className="text-slate-200">{endsLabel}</span>. Pairings
-                {state.fixturesGenerated
-                  ? " have been generated"
-                  : " will appear when at least two players are confirmed"}
-                .
+                <span className="text-slate-200">{endsLabel}</span>
+                {state.matches.length > 0
+                  ? ". Pairings are listed below in Fixtures & scores."
+                  : state.confirmedCount >= 2
+                    ? ". At least two players are confirmed — the draw runs automatically after the close time; refresh in a moment if the table is still empty."
+                    : ". Pairings are drawn once at least two players are confirmed after registration closes."}
               </>
             )}
           </p>
@@ -185,7 +186,11 @@ export default async function HomePage() {
               </p>
             </div>
             <p className="text-xs text-emerald-900/50 dark:text-slate-500">
-              {confirmedLine(state.confirmedCount, state.fixturesGenerated)}
+              {confirmedLine(
+                state.confirmedCount,
+                state.fixturesGenerated,
+                state.matches.length,
+              )}
             </p>
           </div>
           <div className="rounded-2xl border border-emerald-900/10 bg-emerald-50/70 px-4 py-3 text-xs text-emerald-900/70 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
@@ -196,9 +201,15 @@ export default async function HomePage() {
             </span>{" "}
             · Total registered:{" "}
             <span className="font-semibold">{state.totalRegistered}</span>
+            <span className="mt-1 block text-emerald-900/55 dark:text-slate-500">
+              Dates and times follow your device timezone (stored on the server
+              as UTC).
+            </span>
           </div>
           <MatchesTable
             matches={state.matches}
+            confirmedCount={state.confirmedCount}
+            fixturesGenerated={state.fixturesGenerated}
             caption="Tournament fixtures and scores"
           />
         </section>
@@ -246,11 +257,17 @@ export default async function HomePage() {
   );
 }
 
-function confirmedLine(count: number, fixtures: boolean) {
+function confirmedLine(
+  count: number,
+  fixtures: boolean,
+  matchCount: number,
+) {
   if (count === 0) return "No confirmed players yet.";
+  if (matchCount > 0)
+    return `${count} confirmed player${count === 1 ? "" : "s"} in this draw.`;
   if (!fixtures)
-    return `${count} confirmed player${count === 1 ? "" : "s"} — fixtures unlock after registration closes.`;
-  return `${count} confirmed players in this draw.`;
+    return `${count} confirmed player${count === 1 ? "" : "s"} — draw runs after registration closes (needs at least two confirmed).`;
+  return `${count} confirmed player${count === 1 ? "" : "s"} — fixture list should appear shortly; try refreshing.`;
 }
 
 function RulesCard({ rulesMarkdown }: { rulesMarkdown: string }) {
