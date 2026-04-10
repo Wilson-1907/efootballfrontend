@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function ResultUploadForm({
   enabled,
@@ -14,6 +14,16 @@ export function ResultUploadForm({
     "idle",
   );
   const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!enabled) return;
+    void (async () => {
+      const r = await fetch("/api/player/me", { credentials: "same-origin" });
+      if (!r.ok) return;
+      const j = (await r.json()) as { player?: { email?: string } };
+      if (j.player?.email) setEmail(j.player.email);
+    })();
+  }, [enabled]);
 
   if (!enabled) {
     return (
@@ -42,6 +52,7 @@ export function ResultUploadForm({
     setMessage(null);
     const r = await fetch("/api/results/upload", {
       method: "POST",
+      credentials: "same-origin",
       body: fd,
     });
     const j = await r.json().catch(() => ({}));

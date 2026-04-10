@@ -9,6 +9,7 @@ type PlayerRow = {
   email: string;
   phone: string;
   konamiName: string;
+  seasonReserved?: boolean;
   status: string;
   createdAt: string;
 };
@@ -22,6 +23,8 @@ type MatchRow = {
   awayId: string;
   fixtureCode: string | null;
   codeSendAt: string | null;
+  homeCodeSubmittedAt?: string | null;
+  awayCodeSubmittedAt?: string | null;
   homeScore: number | null;
   awayScore: number | null;
   scheduledAt: string | null;
@@ -47,6 +50,7 @@ export type AdminOverviewInitial = {
   };
   players: PlayerRow[];
   matches: MatchRow[];
+  watcherBookings?: { id: string; name: string; email: string; phone: string; createdAt: string }[];
   standings: StandingsRow[];
 };
 
@@ -61,6 +65,7 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
   const [players, setPlayers] = useState(initial.players);
   const [matches, setMatches] = useState(initial.matches);
   const [standings, setStandings] = useState(initial.standings);
+  const [watchers] = useState(initial.watcherBookings ?? []);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -366,6 +371,9 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
               defaultValue={eventLocal}
               className="mt-1 w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-emerald-500/40"
             />
+            <span className="mt-1 block text-xs text-slate-500">
+              Required together with venue before fans can book semifinal/final day seats.
+            </span>
           </label>
           <label className="block text-sm">
             <span className="text-slate-400">Public venue</span>
@@ -509,6 +517,83 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
       </section>
 
       <section className="rounded-2xl border border-white/10 bg-slate-900/50 p-6 shadow-xl overflow-x-auto">
+        <h2 className="text-lg font-semibold text-white">Fixture codes (player confirmations)</h2>
+        <p className="mt-1 text-sm text-slate-400">
+          When home or away confirms the match code on the site, the time is recorded here for each side.
+        </p>
+        <table className="mt-4 w-full min-w-[720px] border-collapse text-left text-sm">
+          <thead>
+            <tr className="border-b border-white/10 text-slate-400">
+              <th className="py-2 pr-3 font-medium">Fixture</th>
+              <th className="py-2 pr-3 font-medium">Code</th>
+              <th className="py-2 pr-3 font-medium">Home confirmed</th>
+              <th className="py-2 pr-3 font-medium">Away confirmed</th>
+            </tr>
+          </thead>
+          <tbody>
+            {matches.filter((m) => m.homeCodeSubmittedAt || m.awayCodeSubmittedAt).length === 0 ? (
+              <tr>
+                <td colSpan={4} className="py-6 text-slate-500">
+                  No codes submitted yet.
+                </td>
+              </tr>
+            ) : (
+              matches
+                .filter((m) => m.homeCodeSubmittedAt || m.awayCodeSubmittedAt)
+                .map((m) => (
+                  <tr key={m.id} className="border-b border-white/5">
+                    <td className="py-2 pr-3 text-white">
+                      {m.home.name} vs {m.away.name}
+                    </td>
+                    <td className="py-2 pr-3 font-mono text-emerald-300">{m.fixtureCode ?? "—"}</td>
+                    <td className="py-2 pr-3 text-slate-400">
+                      {m.homeCodeSubmittedAt
+                        ? new Date(m.homeCodeSubmittedAt).toLocaleString()
+                        : "—"}
+                    </td>
+                    <td className="py-2 pr-3 text-slate-400">
+                      {m.awayCodeSubmittedAt
+                        ? new Date(m.awayCodeSubmittedAt).toLocaleString()
+                        : "—"}
+                    </td>
+                  </tr>
+                ))
+            )}
+          </tbody>
+        </table>
+      </section>
+
+      <section className="rounded-2xl border border-white/10 bg-slate-900/50 p-6 shadow-xl overflow-x-auto">
+        <h2 className="text-lg font-semibold text-white">Finals/Semis seat bookings</h2>
+        <table className="mt-4 w-full min-w-[640px] border-collapse text-left text-sm">
+          <thead>
+            <tr className="border-b border-white/10 text-slate-400">
+              <th className="py-2 pr-3 font-medium">Name</th>
+              <th className="py-2 pr-3 font-medium">Email</th>
+              <th className="py-2 pr-3 font-medium">Phone</th>
+              <th className="py-2 pr-3 font-medium">Booked</th>
+            </tr>
+          </thead>
+          <tbody>
+            {watchers.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="py-6 text-slate-500">No watcher bookings.</td>
+              </tr>
+            ) : (
+              watchers.map((w) => (
+                <tr key={w.id} className="border-b border-white/5">
+                  <td className="py-2 pr-3 text-white">{w.name}</td>
+                  <td className="py-2 pr-3 text-slate-300">{w.email}</td>
+                  <td className="py-2 pr-3 text-slate-300">{w.phone}</td>
+                  <td className="py-2 pr-3 text-slate-400">{new Date(w.createdAt).toLocaleString()}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </section>
+
+      <section className="rounded-2xl border border-white/10 bg-slate-900/50 p-6 shadow-xl overflow-x-auto">
         <h2 className="text-lg font-semibold text-white">Standings</h2>
         <table className="mt-4 w-full min-w-[640px] border-collapse text-left text-sm">
           <thead>
@@ -611,6 +696,16 @@ function MatchEditorRow({
         </div>
         <div className="mt-1 text-[11px] text-slate-500">
           {match.codeSendAt ? `Sends ${new Date(match.codeSendAt).toLocaleTimeString()}` : "Set schedule"}
+        </div>
+        <div className="mt-1 text-[11px] text-slate-500">
+          {match.homeCodeSubmittedAt
+            ? `Home ${new Date(match.homeCodeSubmittedAt).toLocaleString()}`
+            : "Home not submitted"}
+        </div>
+        <div className="mt-1 text-[11px] text-slate-500">
+          {match.awayCodeSubmittedAt
+            ? `Away ${new Date(match.awayCodeSubmittedAt).toLocaleString()}`
+            : "Away not submitted"}
         </div>
       </td>
       <td className="py-3 pr-4">

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { IntroNavEffect } from "@/components/IntroNavEffect";
 
 type Props = {
   splashSrc: string;
@@ -88,20 +89,48 @@ export function SplashGate({ splashSrc, ms, children }: Props) {
               <button
                 type="button"
                 onClick={() => {
-                  window.location.hash = "register";
+                  sessionStorage.setItem("kk_register_tab", "signup");
                   setStage("site");
                 }}
                 className="rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-emerald-950 shadow-lg hover:bg-emerald-400"
               >
-                Reserve a spot
+                Create an account
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  sessionStorage.setItem("kk_register_tab", "login");
+                  setStage("site");
+                }}
+                className="rounded-xl border border-white/25 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+              >
+                Log in
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  sessionStorage.setItem("kk_intro_hash", "finals-seats");
+                  setStage("site");
+                }}
+                className="rounded-xl border border-amber-400/50 bg-amber-500/20 px-5 py-3 text-sm font-semibold text-amber-100 hover:bg-amber-500/30"
+              >
+                Book a seat
               </button>
             </div>
+            <p className="mt-3 text-xs text-slate-500">
+              Booking opens only after the organiser sets the semifinal/final day (public date &amp; venue) on the site.
+            </p>
           </div>
         </div>
       </div>
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <IntroNavEffect />
+      {children}
+    </>
+  );
 }
 

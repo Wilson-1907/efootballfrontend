@@ -65,6 +65,8 @@ export type PublicTournamentState = {
   rulesMarkdown: string;
   publicEventDateTime: string | null;
   publicVenue: string;
+  /** True when admin set public event date/time and venue (required before spectator booking). */
+  finalsBookingOpen?: boolean;
   matches: PublicMatch[];
   standings: StandingsRow[];
   confirmedCount: number;
