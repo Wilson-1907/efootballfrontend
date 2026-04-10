@@ -23,6 +23,55 @@ body {
   font-family: var(--font-sans);
 }
 
+.free-banner {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: #b91c1c; /* red-700 */
+  color: #fff;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+}
+
+.free-banner__viewport {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.free-banner__track {
+  display: inline-block;
+  padding: 12px 0;
+  will-change: transform;
+  animation: freeBannerMarquee 10s linear infinite;
+}
+
+.free-banner__text {
+  display: inline-block;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 18px;
+  padding-left: 100vw;
+}
+
+@keyframes freeBannerMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .free-banner__track {
+    animation: none;
+  }
+  .free-banner__text {
+    padding-left: 0;
+  }
+}
+
 .pitch-bg {
   background-image:
     url("/pitch.svg"),
