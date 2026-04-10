@@ -6,7 +6,8 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "clean": "rimraf .next out"
   },
   "dependencies": {
     "next": "^16.2.2",
@@ -25,6 +26,7 @@
     "eslint-config-next": "16.2.2",
     "jiti": "^2.4.2",
     "postcss": "^8.5.3",
+    "rimraf": "^6.0.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
