@@ -16,6 +16,8 @@ type PlayerRow = {
 type MatchRow = {
   id: string;
   round: number;
+  phase: "league" | "knockout";
+  stage: string;
   homeId: string;
   awayId: string;
   homeScore: number | null;

@@ -15,6 +15,8 @@ export type StandingsRow = {
 export type PublicMatch = {
   id: string;
   round: number;
+  phase: "league" | "knockout";
+  stage: string;
   homeId: string;
   awayId: string;
   homeScore: number | null;

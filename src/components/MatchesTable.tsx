@@ -1,6 +1,8 @@
 type MatchPublic = {
   id: string;
   round: number;
+  phase?: "league" | "knockout";
+  stage?: string;
   status: string;
   homeScore: number | null;
   awayScore: number | null;
@@ -30,6 +32,17 @@ function scoreCell(
   if (status === "completed" && home != null && away != null)
     return `${home} – ${away}`;
   return "—";
+}
+
+function stageLabel(stage?: string): string {
+  if (!stage) return "";
+  if (stage === "league") return "League";
+  if (stage === "round_of_32") return "Round of 32";
+  if (stage === "round_of_16") return "Round of 16";
+  if (stage === "quarter_final") return "Quarter-final";
+  if (stage === "semi_final") return "Semi-final";
+  if (stage === "final") return "Final";
+  return stage.replace(/_/g, " ");
 }
 
 export function MatchesTable({
@@ -70,6 +83,7 @@ export function MatchesTable({
             }
           >
             <th className="py-3 pl-4 pr-3 font-semibold">When</th>
+            <th className="py-3 pr-3 font-semibold">Phase</th>
             <th className="py-3 pr-3 font-semibold">Home</th>
             <th className="py-3 pr-3 font-semibold">Away</th>
             <th className="py-3 pr-4 text-right font-semibold">Score</th>
@@ -79,7 +93,7 @@ export function MatchesTable({
           {matches.length === 0 ? (
             <tr>
               <td
-                colSpan={4}
+                colSpan={5}
                 className={
                   isDark
                     ? "py-10 text-center text-slate-500"
@@ -107,6 +121,15 @@ export function MatchesTable({
                   }
                 >
                   {formatWhen(m.scheduledAt)}
+                </td>
+                <td
+                  className={
+                    isDark
+                      ? "py-3 pr-3 text-slate-300"
+                      : "py-3 pr-3 text-emerald-900/80 dark:text-slate-300"
+                  }
+                >
+                  {stageLabel(m.stage)}
                 </td>
                 <td
                   className={

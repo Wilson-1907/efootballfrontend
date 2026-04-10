@@ -52,7 +52,7 @@ export default async function HomePage() {
   }).format(tEnds);
 
   return (
-    <SplashGate splashSrc="/efootball1.jpeg" ms={5000}>
+    <SplashGate splashSrc="/efootball1.jpeg" ms={3000}>
       <header className="relative overflow-hidden border-b border-white/10">
         <HeroBackdrop />
         <div className="relative mx-auto max-w-5xl px-4 pb-16 pt-12 sm:pt-16">
