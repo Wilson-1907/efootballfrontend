@@ -9,7 +9,6 @@ type PlayerRow = {
   email: string;
   phone: string;
   konamiName: string;
-  paid: boolean;
   status: string;
   createdAt: string;
 };
@@ -193,23 +192,6 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
     window.location.reload();
   }
 
-  async function setPlayerPaid(playerId: string, paid: boolean) {
-    setBusyId(playerId);
-    const r = await fetch("/api/admin/players/confirm", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ playerId, status: "pending", paid }),
-    });
-    setBusyId(null);
-    if (!r.ok) {
-      const j = await r.json().catch(() => ({}));
-      show(j.error ?? "Update failed");
-      return;
-    }
-    setPlayers((list) => list.map((p) => (p.id === playerId ? { ...p, paid } : p)));
-    window.location.reload();
-  }
-
   async function saveMatch(
     matchId: string,
     payload: {
@@ -217,6 +199,8 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
       awayScore?: number | null;
       scheduledAt?: string | null;
       status?: string;
+      homeId?: string;
+      awayId?: string;
     },
   ) {
     setBusyId(matchId);
@@ -387,7 +371,6 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
               <th className="py-2 pr-4 font-medium">Konami name</th>
               <th className="py-2 pr-4 font-medium">Email</th>
               <th className="py-2 pr-4 font-medium">Phone</th>
-              <th className="py-2 pr-4 font-medium">Paid</th>
               <th className="py-2 pr-4 font-medium">Status</th>
               <th className="py-2 font-medium">Actions</th>
             </tr>
@@ -395,7 +378,7 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
           <tbody>
             {players.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-slate-500">
+                <td colSpan={6} className="py-8 text-center text-slate-500">
                   No registrations yet.
                 </td>
               </tr>
@@ -410,17 +393,6 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
                   <td className="py-3 pr-4 text-slate-300">{p.email}</td>
                   <td className="py-3 pr-4 text-slate-300">{p.phone}</td>
                   <td className="py-3 pr-4">
-                    {p.paid ? (
-                      <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-300">
-                        paid
-                      </span>
-                    ) : (
-                      <span className="rounded-full bg-slate-500/15 px-2 py-0.5 text-xs text-slate-300">
-                        not paid
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-3 pr-4">
                     <span
                       className={
                         p.status === "confirmed"
@@ -433,32 +405,12 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
                   </td>
                   <td className="py-3">
                     <div className="flex flex-wrap gap-2">
-                      {!p.paid ? (
-                        <button
-                          type="button"
-                          disabled={busyId === p.id}
-                          onClick={() => setPlayerPaid(p.id, true)}
-                          className="rounded-lg bg-white/10 px-2 py-1 text-xs font-semibold text-white hover:bg-white/15 disabled:opacity-50"
-                        >
-                          Mark paid
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          disabled={busyId === p.id}
-                          onClick={() => setPlayerPaid(p.id, false)}
-                          className="rounded-lg border border-white/15 px-2 py-1 text-xs text-slate-200 hover:bg-white/5 disabled:opacity-50"
-                        >
-                          Unmark paid
-                        </button>
-                      )}
                       {p.status === "pending" ? (
                         <button
                           type="button"
-                          disabled={busyId === p.id || !p.paid}
+                          disabled={busyId === p.id}
                           onClick={() => setPlayerStatus(p.id, "confirmed")}
                           className="rounded-lg bg-emerald-600/80 px-2 py-1 text-xs font-semibold text-white hover:bg-emerald-500 disabled:opacity-50"
-                          title={!p.paid ? "Must be paid first" : undefined}
                         >
                           Confirm
                         </button>
@@ -485,7 +437,8 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
         <h2 className="text-lg font-semibold text-white">Matches &amp; results</h2>
         <p className="mt-1 text-sm text-slate-400">
           Schedule kickoffs and enter scores; standings update when both scores
-          are set.
+          are set. Use walkover buttons for forfeits, or change home/away player
+          selects if a wrong name was placed.
         </p>
         <table className="mt-4 w-full min-w-[720px] border-collapse text-left text-sm">
           <thead>
@@ -510,6 +463,7 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
                 <MatchEditorRow
                   key={m.id}
                   match={m}
+                  players={players}
                   busy={busyId === m.id}
                   onSave={saveMatch}
                 />
@@ -575,10 +529,12 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
 
 function MatchEditorRow({
   match,
+  players,
   busy,
   onSave,
 }: {
   match: MatchRow;
+  players: PlayerRow[];
   busy: boolean;
   onSave: (
     matchId: string,
@@ -587,12 +543,27 @@ function MatchEditorRow({
       awayScore?: number | null;
       scheduledAt?: string | null;
       status?: string;
+      homeId?: string;
+      awayId?: string;
     },
   ) => void;
 }) {
   const defaultSchedule = match.scheduledAt
     ? toDatetimeLocalValue(match.scheduledAt)
     : "";
+
+  const getSelectedIds = () => {
+    const homeEl = document.getElementById(
+      `home-${match.id}`,
+    ) as HTMLSelectElement | null;
+    const awayEl = document.getElementById(
+      `away-${match.id}`,
+    ) as HTMLSelectElement | null;
+    return {
+      homeId: homeEl?.value || undefined,
+      awayId: awayEl?.value || undefined,
+    };
+  };
 
   return (
     <tr className="border-b border-white/5 align-top">
@@ -607,6 +578,36 @@ function MatchEditorRow({
         />
       </td>
       <td className="py-3 pr-4">
+        <div className="mb-2 grid grid-cols-2 gap-2">
+          <select
+            defaultValue={match.homeId}
+            className="w-full rounded-lg border border-white/10 bg-slate-950 px-2 py-1 text-xs text-white"
+            id={`home-${match.id}`}
+            title="Correct home player if wrong"
+          >
+            {players
+              .filter((p) => p.status === "confirmed")
+              .map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.konamiName || p.name}
+                </option>
+              ))}
+          </select>
+          <select
+            defaultValue={match.awayId}
+            className="w-full rounded-lg border border-white/10 bg-slate-950 px-2 py-1 text-xs text-white"
+            id={`away-${match.id}`}
+            title="Correct away player if wrong"
+          >
+            {players
+              .filter((p) => p.status === "confirmed")
+              .map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.konamiName || p.name}
+                </option>
+              ))}
+          </select>
+        </div>
         <div className="flex items-center gap-2">
           <input
             type="number"
@@ -626,36 +627,71 @@ function MatchEditorRow({
         </div>
       </td>
       <td className="py-3">
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => {
-            const schedEl = document.getElementById(
-              `sched-${match.id}`,
-            ) as HTMLInputElement | null;
-            const hsEl = document.getElementById(
-              `hs-${match.id}`,
-            ) as HTMLInputElement | null;
-            const asEl = document.getElementById(
-              `as-${match.id}`,
-            ) as HTMLInputElement | null;
-            const scheduledRaw = schedEl?.value;
-            const scheduledAt =
-              scheduledRaw && scheduledRaw.length > 0
-                ? new Date(scheduledRaw).toISOString()
-                : null;
-            const hs = hsEl?.value === "" ? null : Number(hsEl?.value);
-            const as = asEl?.value === "" ? null : Number(asEl?.value);
-            onSave(match.id, {
-              scheduledAt,
-              homeScore: Number.isFinite(hs as number) ? hs : null,
-              awayScore: Number.isFinite(as as number) ? as : null,
-            });
-          }}
-          className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/15 disabled:opacity-50"
-        >
-          Save
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              const schedEl = document.getElementById(
+                `sched-${match.id}`,
+              ) as HTMLInputElement | null;
+              const hsEl = document.getElementById(
+                `hs-${match.id}`,
+              ) as HTMLInputElement | null;
+              const asEl = document.getElementById(
+                `as-${match.id}`,
+              ) as HTMLInputElement | null;
+              const scheduledRaw = schedEl?.value;
+              const scheduledAt =
+                scheduledRaw && scheduledRaw.length > 0
+                  ? new Date(scheduledRaw).toISOString()
+                  : null;
+              const hs = hsEl?.value === "" ? null : Number(hsEl?.value);
+              const as = asEl?.value === "" ? null : Number(asEl?.value);
+              const { homeId, awayId } = getSelectedIds();
+              onSave(match.id, {
+                scheduledAt,
+                homeId,
+                awayId,
+                homeScore: Number.isFinite(hs as number) ? hs : null,
+                awayScore: Number.isFinite(as as number) ? as : null,
+              });
+            }}
+            className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/15 disabled:opacity-50"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() =>
+              onSave(match.id, {
+                ...getSelectedIds(),
+                homeScore: 3,
+                awayScore: 0,
+                status: "completed",
+              })
+            }
+            className="rounded-lg border border-amber-400/50 bg-amber-500/20 px-3 py-1.5 text-xs font-semibold text-amber-100 hover:bg-amber-500/30 disabled:opacity-50"
+          >
+            Home walkover 3-0
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() =>
+              onSave(match.id, {
+                ...getSelectedIds(),
+                homeScore: 0,
+                awayScore: 3,
+                status: "completed",
+              })
+            }
+            className="rounded-lg border border-amber-400/50 bg-amber-500/20 px-3 py-1.5 text-xs font-semibold text-amber-100 hover:bg-amber-500/30 disabled:opacity-50"
+          >
+            Away walkover 0-3
+          </button>
+        </div>
       </td>
     </tr>
   );

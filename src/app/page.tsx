@@ -131,15 +131,11 @@ export default async function HomePage() {
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
               <p className="text-xs font-semibold uppercase tracking-widest text-emerald-300/90">
-                Payment to be verified
+                Admin approval required
               </p>
               <p className="mt-1">
-                Pay <span className="font-semibold">KSh 200</span> to{" "}
-                <span className="font-semibold">Pochi la Biashara</span>:{" "}
-                <span className="font-semibold">0769227291</span>.
-              </p>
-              <p className="mt-1 text-xs text-slate-400">
-                You will only be approved after payment is verified.
+                After registration, your entry stays pending until an admin
+                reviews and confirms it.
               </p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
