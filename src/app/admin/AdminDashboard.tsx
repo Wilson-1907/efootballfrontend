@@ -39,6 +39,8 @@ export type AdminOverviewInitial = {
     matchDurationMinutes: number;
     breakMinutes: number;
     rulesMarkdown: string;
+    publicEventDateTime: string | null;
+    publicVenue: string;
     tournamentStopped: boolean;
   };
   players: PlayerRow[];
@@ -76,6 +78,10 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
     () => toDatetimeLocalValue(settings.tournamentEndsAt),
     [settings.tournamentEndsAt],
   );
+  const eventLocal = useMemo(
+    () => (settings.publicEventDateTime ? toDatetimeLocalValue(settings.publicEventDateTime) : ""),
+    [settings.publicEventDateTime],
+  );
 
   function show(msg: string) {
     setToast(msg);
@@ -93,6 +99,8 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
     const matchDurationMinutes = Number(fd.get("matchDurationMinutes") ?? 90);
     const breakMinutes = Number(fd.get("breakMinutes") ?? 15);
     const rulesMarkdown = String(fd.get("rulesMarkdown") ?? "");
+    const publicEventDateTimeRaw = String(fd.get("publicEventDateTime") ?? "");
+    const publicVenue = String(fd.get("publicVenue") ?? "");
 
     // Render/server runs in UTC. `datetime-local` strings have no timezone, so we must
     // convert them to ISO in the browser timezone before sending to the API.
@@ -107,6 +115,7 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
     const registrationEndsAt = toIso(registrationEndsAtRaw);
     const tournamentStartsAt = toIso(tournamentStartsAtRaw);
     const tournamentEndsAt = toIso(tournamentEndsAtRaw);
+    const publicEventDateTime = toIso(publicEventDateTimeRaw);
 
     const r = await fetch("/api/admin/settings", {
       method: "PATCH",
@@ -120,6 +129,8 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
         matchDurationMinutes,
         breakMinutes,
         rulesMarkdown,
+        publicEventDateTime: publicEventDateTime || null,
+        publicVenue,
       }),
     });
     if (!r.ok) {
@@ -138,6 +149,8 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
       matchDurationMinutes: j.matchDurationMinutes,
       breakMinutes: j.breakMinutes,
       rulesMarkdown: j.rulesMarkdown,
+      publicEventDateTime: j.publicEventDateTime ?? null,
+      publicVenue: j.publicVenue ?? "",
       fixturesGenerated: j.fixturesGenerated,
       tournamentStopped: j.tournamentStopped ?? s.tournamentStopped,
     }));
@@ -341,6 +354,24 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
               rows={6}
               className="mt-1 w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-emerald-500/40"
               placeholder="- Rule 1\n- Rule 2"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-slate-400">Public event date &amp; time</span>
+            <input
+              type="datetime-local"
+              name="publicEventDateTime"
+              defaultValue={eventLocal}
+              className="mt-1 w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-emerald-500/40"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-slate-400">Public venue</span>
+            <input
+              name="publicVenue"
+              defaultValue={settings.publicVenue}
+              className="mt-1 w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-white outline-none focus:ring-2 focus:ring-emerald-500/40"
+              placeholder="e.g. Karatina Main Grounds"
             />
           </label>
           <div className="sm:col-span-2 flex flex-wrap items-center gap-3">

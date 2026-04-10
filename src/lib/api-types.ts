@@ -61,6 +61,8 @@ export type PublicTournamentState = {
   matchDurationMinutes: number;
   breakMinutes: number;
   rulesMarkdown: string;
+  publicEventDateTime: string | null;
+  publicVenue: string;
   matches: PublicMatch[];
   standings: StandingsRow[];
   confirmedCount: number;

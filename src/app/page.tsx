@@ -50,6 +50,12 @@ export default async function HomePage() {
     dateStyle: "long",
     timeStyle: "short",
   }).format(tEnds);
+  const publicEventLabel = state.publicEventDateTime
+    ? new Intl.DateTimeFormat(undefined, {
+        dateStyle: "long",
+        timeStyle: "short",
+      }).format(new Date(state.publicEventDateTime))
+    : null;
 
   return (
     <SplashGate splashSrc="/efootball1.jpeg" ms={3000}>
@@ -249,6 +255,18 @@ export default async function HomePage() {
               </p>
             </div>
             <RulesCard rulesMarkdown={state.rulesMarkdown} />
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
+              {publicEventLabel && state.publicVenue.trim().length > 0 ? (
+                <p>
+                  Date &amp; time: <span className="font-semibold">{publicEventLabel}</span> · Venue:{" "}
+                  <span className="font-semibold">{state.publicVenue}</span>
+                </p>
+              ) : (
+                <p className="text-slate-300">
+                  The date, time, and venue will be updated to the public whenever it is set.
+                </p>
+              )}
+            </div>
           </section>
         ) : null}
       </div>
