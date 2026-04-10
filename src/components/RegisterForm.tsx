@@ -4,8 +4,10 @@ import { useState } from "react";
 
 export function RegisterForm({
   registrationOpen,
+  registrationEndsAt,
 }: {
   registrationOpen: boolean;
+  registrationEndsAt: string;
 }) {
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "err">(
     "idle",
@@ -23,6 +25,12 @@ export function RegisterForm({
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const endsAt = new Date(registrationEndsAt).getTime();
+    if (!registrationOpen || Number.isNaN(endsAt) || Date.now() >= endsAt) {
+      setStatus("err");
+      setMessage("Registration is closed. You can no longer reserve a spot.");
+      return;
+    }
     setStatus("loading");
     setMessage(null);
     const form = e.currentTarget;

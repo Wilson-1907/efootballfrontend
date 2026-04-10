@@ -159,6 +159,7 @@ export default async function HomePage() {
               registrationOpen={
                 state.registrationOpen && !state.tournamentStopped
               }
+              registrationEndsAt={state.registrationEndsAt}
             />
           </div>
         </section>

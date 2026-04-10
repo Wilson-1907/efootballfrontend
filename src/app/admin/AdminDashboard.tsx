@@ -20,6 +20,8 @@ type MatchRow = {
   stage: string;
   homeId: string;
   awayId: string;
+  fixtureCode: string | null;
+  codeSendAt: string | null;
   homeScore: number | null;
   awayScore: number | null;
   scheduledAt: string | null;
@@ -476,8 +478,8 @@ export function AdminDashboard({ initial }: { initial: AdminOverviewInitial }) {
         <table className="mt-4 w-full min-w-[720px] border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-white/10 text-slate-400">
-              <th className="py-2 pr-4 font-medium">Home</th>
-              <th className="py-2 pr-4 font-medium">Away</th>
+              <th className="py-2 pr-4 font-medium">Fixture</th>
+              <th className="py-2 pr-4 font-medium">Code</th>
               <th className="py-2 pr-4 font-medium">Schedule</th>
               <th className="py-2 pr-4 font-medium">Score</th>
               <th className="py-2 font-medium">Save</th>
@@ -600,8 +602,17 @@ function MatchEditorRow({
 
   return (
     <tr className="border-b border-white/5 align-top">
-      <td className="py-3 pr-4 text-white">{match.home.name}</td>
-      <td className="py-3 pr-4 text-white">{match.away.name}</td>
+      <td className="py-3 pr-4 text-white">
+        {match.home.name} <span className="text-slate-500">vs</span> {match.away.name}
+      </td>
+      <td className="py-3 pr-4">
+        <div className="font-mono text-xs text-emerald-300">
+          {match.fixtureCode ?? "PENDING"}
+        </div>
+        <div className="mt-1 text-[11px] text-slate-500">
+          {match.codeSendAt ? `Sends ${new Date(match.codeSendAt).toLocaleTimeString()}` : "Set schedule"}
+        </div>
+      </td>
       <td className="py-3 pr-4">
         <input
           type="datetime-local"

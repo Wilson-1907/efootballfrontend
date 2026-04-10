@@ -19,6 +19,8 @@ export type PublicMatch = {
   stage: string;
   homeId: string;
   awayId: string;
+  fixtureCode: string | null;
+  codeSendAt: string | null;
   homeScore: number | null;
   awayScore: number | null;
   scheduledAt: string | null;
